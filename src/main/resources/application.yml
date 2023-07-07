@@ -21,3 +21,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://postgres_bill_splitter:5432/postgres
+    username: ${POSTGRES_PROD_USER:postgres}
+    password: ${POSTGRES_PROD_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update

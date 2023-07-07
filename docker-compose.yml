@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  postgres_bill_splitter:
+    image: postgres:15.3
+    container_name: postgres_bill_splitter
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+#      POSTGRES_USER: ${POSTGRES_PROD_USER}
+      POSTGRES_PASSWORD: postgres
+#      POSTGRES_PASSWORD: ${POSTGRES_PROD_PASSWORD}
+    volumes:
+      - /docker/data/postgres/:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  bill-splitter:
+    image: bill-splitter
+    container_name: bill-splitter
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /docker/logs/bill_splitter/log:/app/log
+    environment:
+      JAVA_OPTS: " -Xms700M -Xmx800M"
+      SERVER_PORT: 8080
+      LOGGING_FILE_PATH: '/app/log'
+      SPRING_PROFILES_ACTIVE: prod
+    networks:
+      - backend
+    depends_on:
+      - postgres_bill_splitter
+
+networks:
+  backend:
+
