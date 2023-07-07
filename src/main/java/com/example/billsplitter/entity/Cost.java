@@ -35,5 +35,6 @@ public class Cost {
     private String paidBy;
 
     @ManyToOne
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 }
