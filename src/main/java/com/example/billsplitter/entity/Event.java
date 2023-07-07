@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +26,10 @@ public class Event {
     private String name;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @CollectionTable(name = "event_member" , joinColumns = @JoinColumn(name = "event_id"))
+    @CollectionTable(name = "event_member", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "username", length = 100)
     @ElementCollection
     private List<String> eventMembers = new ArrayList<>();
@@ -36,4 +38,7 @@ public class Event {
     @JoinColumn(name = "event_id")
     private List<Cost> costs = new ArrayList<>();
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date")
+    private Instant createdDate = Instant.now();
 }
