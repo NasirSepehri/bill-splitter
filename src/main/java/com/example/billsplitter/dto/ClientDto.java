@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class UserDto {
+public class ClientDto {
 
 
     private Long id;
 
-    @Size(min = 1, max = 100)
+    private String password;
+
+    @Size(min = 1, max = 255)
     private String username;
 
     @Size(min = 1, max = 100)

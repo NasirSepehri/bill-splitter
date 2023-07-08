@@ -5,7 +5,7 @@ import com.example.billsplitter.dto.EventDto;
 import java.util.List;
 
 public interface EventService {
-    List<EventDto> getAllEventByUserId(Long userId);
+    List<EventDto> getAllEventByClientId(Long clientId);
 
     EventDto addEvent(EventDto eventDto);
 }
