@@ -33,3 +33,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+springdoc:
+  api-docs:
+    enabled: false
