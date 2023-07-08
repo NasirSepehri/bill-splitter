@@ -15,7 +15,7 @@ public class EventDto {
     @Size(min = 1, max = 100)
     private String name;
 
-    private UserDto user;
+    private ClientDto user;
 
     private List<String> eventMembers = new ArrayList<>();
 

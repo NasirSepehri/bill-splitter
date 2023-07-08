@@ -26,8 +26,8 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public List<EventDto> getAllEventByUserId(Long userId) {
-        return eventRepository.findAllByUser_IdOrderByIdAsc(userId).stream()
+    public List<EventDto> getAllEventByClientId(Long clientId) {
+        return eventRepository.findAllByClient_IdOrderByIdAsc(clientId).stream()
                 .map(eventMapper::toDto)
                 .toList();
     }

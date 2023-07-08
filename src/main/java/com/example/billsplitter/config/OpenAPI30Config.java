@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Bill Splitter API", version = "v1.0.0", description = "Bill Splitter"))
-public class OpenAPI30Configuration {
+public class OpenAPI30Config {
 
     @Bean
     public OpenAPI customizeOpenAPI() {

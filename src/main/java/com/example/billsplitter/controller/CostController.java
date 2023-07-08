@@ -2,6 +2,7 @@ package com.example.billsplitter.controller;
 
 import com.example.billsplitter.dto.CostDto;
 import com.example.billsplitter.service.CostService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class CostController {
 
 
     @PostMapping
-    CostDto add(@RequestBody CostDto costDto) {
+    CostDto add(@RequestBody @Valid CostDto costDto) {
         return costService.add(costDto);
     }
 

@@ -26,8 +26,8 @@ public class Event {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 
     @CollectionTable(name = "event_member", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "username", length = 100)
