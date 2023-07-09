@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "user")
+@RequestMapping(value = "client")
 public class ClientController {
 
     private final ClientService clientService;
@@ -23,8 +23,8 @@ public class ClientController {
     }
 
     @Operation(
-            summary = "Add a new user",
-            description = "Add a new user by UserDto field such as a username, first name and etc. The response is UserDto with user id")
+            summary = "Add a new client",
+            description = "Add a new Client by ClientDto field such as a username, first name and etc. The response is clientDto with client id")
     @PostMapping
     public ClientDto add(@RequestBody @Valid ClientDto clientDto) {
         return clientService.addUser(clientDto);
