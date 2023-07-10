@@ -1,15 +1,14 @@
-= Bill Splitter
+### Bill Splitter
 
 Bill Splitter is a simple web app that helps you split bills with your friends.
 You can enter the total amount, the number of people, and the app will calculate how much each person should pay.
 
-== Requirement
+### Requirement
 
 For run application you need to the _Postgres_ database.
 You can use below docker-compose.yml.
 
-[source,yaml]
-----
+```yaml
 version: '3.9'
 
 services:
@@ -28,41 +27,43 @@ services:
       - /docker/data/postgres/:/var/lib/postgresql/data
     networks:
       - backend
-----
+```
 
-=== Build
+### Build
 
 You can use the `Maven` command to build the project.
 
-[source,bash]
-----
+```bash
 mvn clean package
-----
 
-=== Test
+```
+
+### Test
 
 You can use the `Maven` command to run the tests.
 
-[bash]
-----
+```bash
 mvn clean test -Dspring.profiles.active=test
-----
+```
 
 FYI: You must set active profile to the `test`.
 
-=== Swagger
+### Swagger
 
-Swagger is a suite of tools for API developers from SmartBear Software and a former specification upon which the OpenAPI Specification is based.
+Swagger is a suite of tools for API developers from SmartBear Software and a former specification upon which the OpenAPI
+Specification is based.
 
-For access to swagger page you can use below URL:
+For access to the `Swagger` page you can use below URL:
 
-[url]
-----
+```text
 http://localhost:8080/swagger-ui/index.html
-----
+```
 
-image::.graphics/bill-splitter.iml[]
+<p>
+<img src=".graphics/bill-splitter.png" width="1537" height="935" alt="swagger">
+</p>
 
-=== usage
+### usage
+
 
 
