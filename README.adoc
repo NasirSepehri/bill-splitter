@@ -1,0 +1,4 @@
+= Bill Splitter
+
+Bill Splitter is a simple web app that helps you split bills with your friends.
+You can enter the total amount, the number of people, and the app will calculate how much each person should pay.
