@@ -1,11 +1,11 @@
 package com.example.billsplitter.service;
 
-import com.example.billsplitter.dto.AuthenticationRequestDto;
-import com.example.billsplitter.dto.AuthenticationResponseDto;
-import com.example.billsplitter.dto.ClientDto;
+import com.example.billsplitter.dto.client.AuthenticationRequestDto;
+import com.example.billsplitter.dto.client.AuthenticationResponseDto;
+import com.example.billsplitter.dto.client.SignUpDto;
 
 public interface AuthenticationService {
-    AuthenticationResponseDto signUp(ClientDto clientDto);
+    AuthenticationResponseDto signUp(SignUpDto signUpDto);
 
     AuthenticationResponseDto signIn(AuthenticationRequestDto authenticationRequestDto);
 }

@@ -1,4 +1,4 @@
-package com.example.billsplitter.dto;
+package com.example.billsplitter.dto.cost;
 
 import lombok.Data;
 

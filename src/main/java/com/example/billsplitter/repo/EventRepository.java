@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
-    List<Event> findAllByClient_IdOrderByIdAsc(Long clientId);
+    List<Event> findAllByClientUsernameOrderByIdAsc(String username);
 }

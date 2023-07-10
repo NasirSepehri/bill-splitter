@@ -1,8 +1,8 @@
 package com.example.billsplitter.component;
 
-import com.example.billsplitter.dto.JwtUserDetails;
-import com.example.billsplitter.service.JwtTokenService;
-import com.example.billsplitter.service.JwtUserDetailsService;
+import com.example.billsplitter.dto.client.JwtUserDetails;
+import com.example.billsplitter.service.impl.JwtTokenServiceImpl;
+import com.example.billsplitter.service.impl.JwtUserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,13 +21,13 @@ import java.io.IOException;
 public class JwtRequestFilterComponent extends OncePerRequestFilter {
 
 
-    private final JwtTokenService jwtTokenService;
-    private final JwtUserDetailsService jwtUserDetailsService;
+    private final JwtTokenServiceImpl jwtTokenServiceImpl;
+    private final JwtUserDetailsServiceImpl jwtUserDetailsServiceImpl;
 
 
-    public JwtRequestFilterComponent(JwtTokenService jwtTokenService, JwtUserDetailsService jwtUserDetailsService) {
-        this.jwtTokenService = jwtTokenService;
-        this.jwtUserDetailsService = jwtUserDetailsService;
+    public JwtRequestFilterComponent(JwtTokenServiceImpl jwtTokenServiceImpl, JwtUserDetailsServiceImpl jwtUserDetailsServiceImpl) {
+        this.jwtTokenServiceImpl = jwtTokenServiceImpl;
+        this.jwtUserDetailsServiceImpl = jwtUserDetailsServiceImpl;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class JwtRequestFilterComponent extends OncePerRequestFilter {
         }
 
         final String token = header.substring(7);
-        final String username = jwtTokenService.validateTokenAndGetUsername(token);
+        final String username = jwtTokenServiceImpl.validateTokenAndGetUsername(token);
         if (username == null) {
             // validation failed or token expired
             chain.doFilter(request, response);
@@ -49,7 +49,7 @@ public class JwtRequestFilterComponent extends OncePerRequestFilter {
         }
 
         // set user details on spring security context
-        final JwtUserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+        final JwtUserDetails userDetails = jwtUserDetailsServiceImpl.loadUserByUsername(username);
         final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

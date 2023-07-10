@@ -1,4 +1,4 @@
-package com.example.billsplitter.service;
+package com.example.billsplitter.service.impl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -13,14 +13,14 @@ import java.time.Instant;
 
 @Service
 @Slf4j
-public class JwtTokenService {
+public class JwtTokenServiceImpl {
 
     private static final Duration JWT_TOKEN_VALIDITY = Duration.ofMinutes(20);
 
     private final Algorithm hmac512;
     private final JWTVerifier verifier;
 
-    public JwtTokenService(@Value("${jwt.secret}") final String secret) {
+    public JwtTokenServiceImpl(@Value("${jwt.secret}") final String secret) {
         this.hmac512 = Algorithm.HMAC512(secret);
         this.verifier = JWT.require(this.hmac512).build();
     }

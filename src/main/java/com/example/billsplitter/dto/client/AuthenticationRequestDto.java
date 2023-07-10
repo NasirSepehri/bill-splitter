@@ -1,4 +1,4 @@
-package com.example.billsplitter.dto;
+package com.example.billsplitter.dto.client;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

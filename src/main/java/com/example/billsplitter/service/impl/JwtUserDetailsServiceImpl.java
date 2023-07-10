@@ -1,7 +1,7 @@
-package com.example.billsplitter.service;
+package com.example.billsplitter.service.impl;
 
 import com.example.billsplitter.component.MessageByLocaleComponent;
-import com.example.billsplitter.dto.JwtUserDetails;
+import com.example.billsplitter.dto.client.JwtUserDetails;
 import com.example.billsplitter.entity.Client;
 import com.example.billsplitter.enums.ClientRolesEnum;
 import com.example.billsplitter.exception.AppException;
@@ -15,14 +15,14 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class JwtUserDetailsService implements UserDetailsService {
+public class JwtUserDetailsServiceImpl implements UserDetailsService {
 
     private final ClientRepository clientRepository;
     private final MessageByLocaleComponent messageByLocaleComponent;
 
     @Autowired
-    public JwtUserDetailsService(ClientRepository clientRepository,
-                                 MessageByLocaleComponent messageByLocaleComponent) {
+    public JwtUserDetailsServiceImpl(ClientRepository clientRepository,
+                                     MessageByLocaleComponent messageByLocaleComponent) {
         this.clientRepository = clientRepository;
         this.messageByLocaleComponent = messageByLocaleComponent;
     }

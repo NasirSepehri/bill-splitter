@@ -1,7 +1,7 @@
 package com.example.billsplitter.service;
 
 import com.example.billsplitter.component.MessageByLocaleComponent;
-import com.example.billsplitter.dto.PaymentsResponseDto;
+import com.example.billsplitter.dto.cost.PaymentsResponseDto;
 import com.example.billsplitter.entity.Client;
 import com.example.billsplitter.entity.Cost;
 import com.example.billsplitter.entity.Event;

@@ -1,5 +1,7 @@
-package com.example.billsplitter.dto;
+package com.example.billsplitter.dto.event;
 
+import com.example.billsplitter.dto.client.ClientDto;
+import com.example.billsplitter.dto.cost.CostDto;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -15,7 +17,7 @@ public class EventDto {
     @Size(min = 1, max = 100)
     private String name;
 
-    private ClientDto user;
+    private ClientDto client;
 
     private List<String> eventMembers = new ArrayList<>();
 
