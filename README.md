@@ -65,5 +65,27 @@ http://localhost:8080/swagger-ui/index.html
 
 ### usage
 
+Create a client by `/auth/sing-up` URL:
+<p>
+<img src=".graphics/sign-up.png" width="1537" height="935" alt="swagger">
+</p>
 
+This API return a Token ID that you must send it with evey request. Add this token with `Bearer ` prefix and add it to
+http header with `Authorization` key.
 
+```text
+Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOYXNpclNlcGVocmkiLCJpc3MiOiJhcHAiLCJpYXQiOjE2ODg5OTAwNzQsImV4cCI6MTY4ODk5MTI3NH0.X3moZDbym6K6XObxQ_wnGXHvc-aAGe-cvpoQj1Scq1QExVwkxmtc9I0nUyVElzVkWwicWaYcnv8X8HTQAjmX0A
+```
+
+In Swagger page you must add this token to without `Bearer` like below:
+<p>
+<img src=".graphics/auth.png" width="1537" height="935" alt="swagger">
+</p>
+
+After sign up you can use `/auth/sign-in` URL to get Token ID by your `username` and `password`.
+
+Then add an Event by Post request with the `/event` URL.
+Then you can add costs by Post request with the `/cost` URL.
+
+At last by Get request with the `/cost/payments` URL and `evnetId` application calculate how much each person should
+pay. 
