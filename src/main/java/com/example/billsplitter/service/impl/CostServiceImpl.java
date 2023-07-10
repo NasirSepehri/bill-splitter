@@ -1,8 +1,8 @@
 package com.example.billsplitter.service.impl;
 
 import com.example.billsplitter.component.MessageByLocaleComponent;
-import com.example.billsplitter.dto.CostDto;
-import com.example.billsplitter.dto.PaymentsResponseDto;
+import com.example.billsplitter.dto.cost.CostDto;
+import com.example.billsplitter.dto.cost.PaymentsResponseDto;
 import com.example.billsplitter.entity.Cost;
 import com.example.billsplitter.entity.Event;
 import com.example.billsplitter.exception.AppException;
@@ -39,29 +39,33 @@ public class CostServiceImpl implements CostService {
 
 
     @Override
-    public List<CostDto> getAllCostByEventId(Long eventId) {
+    public List<CostDto> getAllCostByEventId(Long eventId, String username) {
+        getEvent(eventId, username);
         return costRepository.findAllByEvent_IdOrderByIdAsc(eventId).stream()
                 .map(costMapper::toDto)
                 .toList();
     }
 
     @Override
-    public CostDto add(CostDto costDto) {
+    public CostDto add(CostDto costDto, String username) {
+        getEvent(costDto.getEvent().getId(), username);
         Cost savedCost = costRepository.save(costMapper.toEntity(costDto));
         return costMapper.toDto(savedCost);
     }
 
     @Override
-    public void delete(Long costId) {
-        costRepository.deleteById(costId);
+    public String delete(Long costId, String username) {
+        return costRepository.findById(costId).map(cost -> {
+            getEvent(cost.getEvent().getId(), username);
+            costRepository.deleteById(costId);
+            return "Done";
+        }).orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent.getMessage("cost.not.found",
+                new Object[]{String.valueOf(costId)})));
     }
 
     @Override
     public PaymentsResponseDto calculatePayments(final Long eventId, final String username) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent
-                        .getMessage("event.not.found", new Object[]{String.valueOf(eventId)})));
-        checkClientPermission(username, event);
+        Event event = getEvent(eventId, username);
         Map<String, Float> eventMembersMap = event.getEventMembers().stream().collect(Collectors.toConcurrentMap(s -> s, s -> 0.0F));
         event.getCosts().forEach(cost -> {
             List<String> splitBetween = cost.getSplitBetween();
@@ -76,9 +80,14 @@ public class CostServiceImpl implements CostService {
         return paymentsResponseDto;
     }
 
-    private void checkClientPermission(String username, Event event) {
+    private Event getEvent(Long eventId, String username) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent
+                        .getMessage("event.not.found", new Object[]{String.valueOf(eventId)})));
         if (!username.equals(event.getClient().getUsername())) {
             throw new AppException.Forbidden(messageByLocaleComponent.getMessage("permission.denied"));
         }
+        return event;
     }
+
 }

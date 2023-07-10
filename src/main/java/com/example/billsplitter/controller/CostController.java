@@ -1,7 +1,7 @@
 package com.example.billsplitter.controller;
 
-import com.example.billsplitter.dto.CostDto;
-import com.example.billsplitter.dto.PaymentsResponseDto;
+import com.example.billsplitter.dto.cost.CostDto;
+import com.example.billsplitter.dto.cost.PaymentsResponseDto;
 import com.example.billsplitter.service.CostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +23,19 @@ public class CostController {
 
 
     @GetMapping("/all")
-    List<CostDto> getAllCostByEventId(@RequestParam("eventId") Long eventId) {
-        return costService.getAllCostByEventId(eventId);
+    List<CostDto> getAllCostByEventId(@RequestParam("eventId") Long eventId, Principal principal) {
+        return costService.getAllCostByEventId(eventId, principal.getName());
     }
 
 
     @PostMapping
-    CostDto add(@RequestBody @Valid CostDto costDto) {
-        return costService.add(costDto);
+    CostDto add(@RequestBody @Valid CostDto costDto, Principal principal) {
+        return costService.add(costDto, principal.getName());
     }
 
     @DeleteMapping
-    void delete(@RequestParam("costId") Long costId) {
-        costService.delete(costId);
+    String delete(@RequestParam("costId") Long costId, Principal principal) {
+        return costService.delete(costId, principal.getName());
     }
 
 

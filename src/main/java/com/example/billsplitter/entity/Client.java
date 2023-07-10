@@ -4,16 +4,18 @@ import com.example.billsplitter.enums.ClientRolesEnum;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "client")
+@Table(name = "client", indexes = @Index(columnList = "username"))
 @Setter
 @Getter
 @EqualsAndHashCode
+@NoArgsConstructor
 public class Client {
 
     @Id
@@ -44,5 +46,21 @@ public class Client {
     @JoinColumn(name = "client_id")
     private List<Event> events = new ArrayList<>();
 
+    public Client(Long clientId) {
+        this.setId(clientId);
+    }
 
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", password='" + "*****" + '\'' +
+                ", username='" + username + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                ", events=" + events +
+                '}';
+    }
 }

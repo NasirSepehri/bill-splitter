@@ -1,5 +1,6 @@
-package com.example.billsplitter.dto;
+package com.example.billsplitter.dto.client;
 
+import com.example.billsplitter.dto.event.EventDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -12,8 +13,6 @@ public class ClientDto {
 
 
     private Long id;
-
-    private String password;
 
     @Size(min = 1, max = 255)
     private String username;

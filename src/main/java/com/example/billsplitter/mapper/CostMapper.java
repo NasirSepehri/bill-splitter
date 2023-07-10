@@ -1,7 +1,7 @@
 package com.example.billsplitter.mapper;
 
-import com.example.billsplitter.dto.CostDto;
-import com.example.billsplitter.dto.EventDto;
+import com.example.billsplitter.dto.cost.CostDto;
+import com.example.billsplitter.dto.event.EventDto;
 import com.example.billsplitter.entity.Cost;
 import com.example.billsplitter.entity.Event;
 import org.mapstruct.Mapper;

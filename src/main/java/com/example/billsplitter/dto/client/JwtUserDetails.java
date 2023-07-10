@@ -1,4 +1,4 @@
-package com.example.billsplitter.dto;
+package com.example.billsplitter.dto.client;
 
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,4 +17,7 @@ public class JwtUserDetails extends User {
         this.id = id;
     }
 
+    public Long getId() {
+        return id;
+    }
 }

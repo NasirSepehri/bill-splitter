@@ -1,6 +1,6 @@
 package com.example.billsplitter.mapper;
 
-import com.example.billsplitter.dto.ClientDto;
+import com.example.billsplitter.dto.client.ClientDto;
 import com.example.billsplitter.entity.Client;
 import org.mapstruct.Mapper;
 
