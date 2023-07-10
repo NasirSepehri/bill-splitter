@@ -1,0 +1,40 @@
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE/bill-splitter$CI_COMMIT_TAG
+stages:
+  - build
+  - docker
+
+
+maven-build:
+  image: maven:3.8.5-openjdk-17-slim
+  services:
+    - name: docker:dind
+      command: [ '--tls=false', '--host=tcp://0.0.0.0:2376' ]
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_DRIVER: "overlay2"
+
+  only:
+    - develop
+  stage: build
+  script: "mvn clean package -B -Dspring.profiles.active=test"
+  artifacts:
+    paths:
+      - target/*.jar
+
+
+container-build:
+  image: docker
+  services:
+    - name: docker:dind
+      command: [ '--tls=false', '--host=tcp://0.0.0.0:2376' ]
+  stage: docker
+  tags:
+    - gitlab-org-docker
+  only:
+    - develop
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
