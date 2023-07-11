@@ -40,8 +40,8 @@ public class CostServiceImpl implements CostService {
 
 
     @Override
-    public List<CostDto> getAllCostByEventId(Long eventId, String username) {
-        getEvent(eventId, username);
+    public List<CostDto> getAllCostByEventId(Long eventId, Long clientId) {
+        getEvent(eventId, clientId);
         return costRepository.findAllByEvent_IdOrderByIdAsc(eventId).stream()
                 .map(costMapper::toDto)
                 .toList();
@@ -49,17 +49,17 @@ public class CostServiceImpl implements CostService {
 
     @Override
     @Transactional
-    public CostDto add(CostDto costDto, String username) {
-        getEvent(costDto.getEvent().getId(), username);
+    public CostDto add(CostDto costDto, Long clientId) {
+        getEvent(costDto.getEvent().getId(), clientId);
         Cost savedCost = costRepository.save(costMapper.toEntity(costDto));
         return costMapper.toDto(savedCost);
     }
 
     @Override
     @Transactional
-    public String delete(Long costId, String username) {
+    public String delete(Long costId, Long clientId) {
         return costRepository.findById(costId).map(cost -> {
-            getEvent(cost.getEvent().getId(), username);
+            getEvent(cost.getEvent().getId(), clientId);
             costRepository.deleteById(costId);
             return "Done";
         }).orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent.getMessage("cost.not.found",
@@ -67,8 +67,8 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public PaymentsResponseDto calculatePayments(final Long eventId, final String username) {
-        Event event = getEvent(eventId, username);
+    public PaymentsResponseDto calculatePayments(final Long eventId, final Long clientId) {
+        Event event = getEvent(eventId, clientId);
         Map<String, Float> eventMembersMap = event.getEventMembers().stream().collect(Collectors.toConcurrentMap(s -> s, s -> 0.0F));
         event.getCosts().forEach(cost -> {
             List<String> splitBetween = cost.getSplitBetween();
@@ -83,11 +83,11 @@ public class CostServiceImpl implements CostService {
         return paymentsResponseDto;
     }
 
-    private Event getEvent(Long eventId, String username) {
+    private Event getEvent(Long eventId, Long clientId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent
                         .getMessage("event.not.found", new Object[]{String.valueOf(eventId)})));
-        if (!username.equals(event.getClient().getUsername())) {
+        if (!clientId.equals(event.getClient().getId())) {
             throw new AppException.Forbidden(messageByLocaleComponent.getMessage("permission.denied"));
         }
         return event;

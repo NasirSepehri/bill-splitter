@@ -85,6 +85,8 @@ class CostServiceTest {
 
         event.setCosts(List.of(cost1, cost2, cost3));
 
+        event.setClient(new Client(1L));
+
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
 
@@ -97,7 +99,7 @@ class CostServiceTest {
 //    Column Sum	-80.00	    -80.00	    186.66666   -26.666666	 |   Row Sum=0
 
 
-        PaymentsResponseDto paymentsResponseDto = costServiceImpl.calculatePayments(1L, "Client1");
+        PaymentsResponseDto paymentsResponseDto = costServiceImpl.calculatePayments(1L, 1L);
         Map<String, Float> paymentsMap = paymentsResponseDto.getPayments();
 
         assertEquals(-80.00F, paymentsMap.get("Client1"));
@@ -112,14 +114,12 @@ class CostServiceTest {
         Event event = new Event();
         event.setId(1L);
         event.setName("event1");
-        event.setClient(new Client() {{
-            setUsername("Client1");
-        }});
+        event.setClient(new Client(1L));
         event.setEventMembers(List.of("Client1", "Client2", "Client3", "Client4"));
 
         event.setCreatedDate(Instant.now());
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
-        assertThrows(AppException.Forbidden.class, () -> costServiceImpl.calculatePayments(1L, "Client22"));
+        assertThrows(AppException.Forbidden.class, () -> costServiceImpl.calculatePayments(1L, 2L));
     }
 }

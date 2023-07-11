@@ -1,9 +1,13 @@
 package com.example.billsplitter.service.impl;
 
+import com.example.billsplitter.component.MessageByLocaleComponent;
 import com.example.billsplitter.dto.event.AddEventDto;
+import com.example.billsplitter.dto.event.EditEventDto;
 import com.example.billsplitter.dto.event.EventDto;
+import com.example.billsplitter.dto.event.MemberDto;
 import com.example.billsplitter.entity.Client;
 import com.example.billsplitter.entity.Event;
+import com.example.billsplitter.exception.AppException;
 import com.example.billsplitter.mapper.EventMapper;
 import com.example.billsplitter.repo.EventRepository;
 import com.example.billsplitter.service.EventService;
@@ -21,12 +25,16 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
+    private final MessageByLocaleComponent messageByLocaleComponent;
+
 
     @Autowired
     public EventServiceImpl(EventRepository eventRepository,
-                            EventMapper eventMapper) {
+                            EventMapper eventMapper,
+                            MessageByLocaleComponent messageByLocaleComponent) {
         this.eventRepository = eventRepository;
         this.eventMapper = eventMapper;
+        this.messageByLocaleComponent = messageByLocaleComponent;
     }
 
 
@@ -45,10 +53,54 @@ public class EventServiceImpl implements EventService {
         event.setName(addEventDto.getName());
         event.setClient(new Client(clientId));
         event.setCreatedDate(Instant.now());
+        event.setDescription(addEventDto.getDescription());
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toDto(savedEvent);
 
     }
 
+    @Override
+    @Transactional
+    public EventDto editEvent(EditEventDto editEventDto, Long clientId) {
+        Event event = getEvent(editEventDto.getEventId(), clientId);
+        event.setName(editEventDto.getName());
+        event.setDescription(editEventDto.getDescription());
+        Event savedEvent = eventRepository.save(event);
+        return eventMapper.toDto(savedEvent);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long eventId, Long clientId) {
+        Event event = getEvent(eventId, clientId);
+        eventRepository.delete(event);
+    }
+
+    @Override
+    @Transactional
+    //// TODO: 7/11/23 change event table structure
+    public MemberDto addMember(MemberDto memberDto, Long clientId) {
+        Event event = getEvent(memberDto.getEventId(), clientId);
+        event.getEventMembers().add(memberDto.getMemberUsername());
+        return memberDto;
+    }
+
+
+    @Override
+    public void deleteMember(Long eventId, String memberUsername, Long clientId) {
+        Event event = getEvent(eventId, clientId);
+        eventRepository.deleteMemberByEventIdAndMemberUsername(event.getId(), memberUsername);
+    }
+
+
+    private Event getEvent(Long eventId, Long clientId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent
+                        .getMessage("event.not.found", new Object[]{String.valueOf(eventId)})));
+        if (!clientId.equals(event.getClient().getId())) {
+            throw new AppException.Forbidden(messageByLocaleComponent.getMessage("permission.denied"));
+        }
+        return event;
+    }
 
 }

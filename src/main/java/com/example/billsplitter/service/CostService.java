@@ -6,11 +6,11 @@ import com.example.billsplitter.dto.cost.PaymentsResponseDto;
 import java.util.List;
 
 public interface CostService {
-    List<CostDto> getAllCostByEventId(Long eventId, String username);
+    List<CostDto> getAllCostByEventId(Long eventId, Long clientId);
 
-    CostDto add(CostDto costDto, String username);
+    CostDto add(CostDto costDto, Long clientId);
 
-    String delete(Long costId, String username);
+    String delete(Long costId, Long clientId);
 
-    PaymentsResponseDto calculatePayments(final Long eventId, final String username);
+    PaymentsResponseDto calculatePayments(final Long eventId, final Long clientId);
 }

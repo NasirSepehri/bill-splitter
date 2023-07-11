@@ -25,6 +25,9 @@ public class Event {
     @Column(name = "name", length = 100, nullable = false)
     private String name;
 
+    @Column(name = "description", length = 255)
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
