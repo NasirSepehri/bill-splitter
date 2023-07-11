@@ -89,9 +89,9 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public void deleteMember(Long eventId, String memberUsername, UUID clientId) {
+    public void deleteMember(Long eventId, UUID memberUuid, UUID clientId) {
         Event event = getEvent(eventId, clientId);
-        eventRepository.deleteMemberByEventIdAndMemberUsername(event.getId(), memberUsername);
+        eventRepository.deleteMemberByEventIdAndMemberUsername(event.getId(), memberUuid);
     }
 
 

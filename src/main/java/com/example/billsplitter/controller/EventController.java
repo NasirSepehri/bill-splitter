@@ -69,10 +69,10 @@ public class EventController {
     @Operation(
             summary = "Delete member",
             description = "Client enter event id and member uuid for delete member from event")
-    void deleteMember(@RequestParam("eventId") Long eventId, @RequestParam("memberUsername") String memberUsername,
+    void deleteMember(@RequestParam("eventId") Long eventId, @RequestParam("memberUuid") UUID memberUuid,
                       Authentication authentication) {
         UUID clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
-        eventService.deleteMember(eventId, memberUsername, clientId);
+        eventService.deleteMember(eventId, memberUuid, clientId);
     }
 
     @DeleteMapping
