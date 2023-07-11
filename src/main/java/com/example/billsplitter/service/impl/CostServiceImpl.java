@@ -12,6 +12,7 @@ import com.example.billsplitter.repo.EventRepository;
 import com.example.billsplitter.service.CostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
+    @Transactional
     public CostDto add(CostDto costDto, String username) {
         getEvent(costDto.getEvent().getId(), username);
         Cost savedCost = costRepository.save(costMapper.toEntity(costDto));
@@ -54,6 +56,7 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
+    @Transactional
     public String delete(Long costId, String username) {
         return costRepository.findById(costId).map(cost -> {
             getEvent(cost.getEvent().getId(), username);

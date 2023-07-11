@@ -2,12 +2,12 @@ package com.example.billsplitter.component;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
-@Configuration
+@Component
 public class MessageByLocaleComponent {
 
     private final MessageSource messageSource;

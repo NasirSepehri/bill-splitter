@@ -1,6 +1,5 @@
-package com.example.billsplitter.service.impl;
+package com.example.billsplitter.component;
 
-import com.example.billsplitter.component.MessageByLocaleComponent;
 import com.example.billsplitter.dto.client.JwtUserDetails;
 import com.example.billsplitter.entity.Client;
 import com.example.billsplitter.enums.ClientRolesEnum;
@@ -9,20 +8,20 @@ import com.example.billsplitter.repo.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
-@Service
-public class JwtUserDetailsServiceImpl implements UserDetailsService {
+@Component
+public class JwtUserDetailsComponent implements UserDetailsService {
 
     private final ClientRepository clientRepository;
     private final MessageByLocaleComponent messageByLocaleComponent;
 
     @Autowired
-    public JwtUserDetailsServiceImpl(ClientRepository clientRepository,
-                                     MessageByLocaleComponent messageByLocaleComponent) {
+    public JwtUserDetailsComponent(ClientRepository clientRepository,
+                                   MessageByLocaleComponent messageByLocaleComponent) {
         this.clientRepository = clientRepository;
         this.messageByLocaleComponent = messageByLocaleComponent;
     }

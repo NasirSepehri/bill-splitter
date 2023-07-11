@@ -1,5 +1,7 @@
 package com.example.billsplitter.service.impl;
 
+import com.example.billsplitter.component.JwtTokenComponent;
+import com.example.billsplitter.component.JwtUserDetailsComponent;
 import com.example.billsplitter.component.MessageByLocaleComponent;
 import com.example.billsplitter.dto.client.AuthenticationRequestDto;
 import com.example.billsplitter.dto.client.AuthenticationResponseDto;
@@ -15,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -22,25 +25,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
     private final MessageByLocaleComponent messageByLocaleComponent;
-    private final JwtTokenServiceImpl jwtTokenServiceImpl;
-    private final JwtUserDetailsServiceImpl jwtUserDetailsServiceImpl;
+    private final JwtTokenComponent jwtTokenComponent;
+    private final JwtUserDetailsComponent jwtUserDetailsComponent;
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationServiceImpl(ClientRepository clientRepository,
                                      PasswordEncoder passwordEncoder,
                                      MessageByLocaleComponent messageByLocaleComponent,
-                                     JwtTokenServiceImpl jwtTokenServiceImpl,
-                                     JwtUserDetailsServiceImpl jwtUserDetailsServiceImpl,
+                                     JwtTokenComponent jwtTokenComponent,
+                                     JwtUserDetailsComponent jwtUserDetailsComponent,
                                      AuthenticationManager authenticationManager) {
         this.clientRepository = clientRepository;
         this.passwordEncoder = passwordEncoder;
         this.messageByLocaleComponent = messageByLocaleComponent;
-        this.jwtTokenServiceImpl = jwtTokenServiceImpl;
-        this.jwtUserDetailsServiceImpl = jwtUserDetailsServiceImpl;
+        this.jwtTokenComponent = jwtTokenComponent;
+        this.jwtUserDetailsComponent = jwtUserDetailsComponent;
         this.authenticationManager = authenticationManager;
     }
 
     @Override
+    @Transactional
     public AuthenticationResponseDto signUp(SignUpDto signUpDto) {
         Client client = new Client();
         client.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
@@ -51,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         client.setRole(ClientRolesEnum.ROLE_USER);
 
         clientRepository.save(client);
-        var jwt = jwtTokenServiceImpl.generateToken(client.getUsername());
+        var jwt = jwtTokenComponent.generateToken(client.getUsername());
         return AuthenticationResponseDto.builder().accessToken(jwt).build();
     }
 
@@ -64,9 +68,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException.AuthorizationFailed(messageByLocaleComponent.getMessage("username.or.password.incorrect"));
         }
 
-        final UserDetails userDetails = jwtUserDetailsServiceImpl.loadUserByUsername(authenticationRequestDto.getUsername());
+        final UserDetails userDetails = jwtUserDetailsComponent.loadUserByUsername(authenticationRequestDto.getUsername());
         final AuthenticationResponseDto authenticationResponseDto = new AuthenticationResponseDto();
-        authenticationResponseDto.setAccessToken(jwtTokenServiceImpl.generateToken(userDetails.getUsername()));
+        authenticationResponseDto.setAccessToken(jwtTokenComponent.generateToken(userDetails.getUsername()));
         return authenticationResponseDto;
     }
 }

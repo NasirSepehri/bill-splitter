@@ -42,7 +42,7 @@ public class Client {
     @Enumerated(EnumType.STRING)
     private ClientRolesEnum role;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
     private List<Event> events = new ArrayList<>();
 

@@ -1,4 +1,4 @@
-package com.example.billsplitter.service.impl;
+package com.example.billsplitter.component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -6,21 +6,21 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
 
-@Service
+@Component
 @Slf4j
-public class JwtTokenServiceImpl {
+public class JwtTokenComponent {
 
     private static final Duration JWT_TOKEN_VALIDITY = Duration.ofMinutes(20);
 
     private final Algorithm hmac512;
     private final JWTVerifier verifier;
 
-    public JwtTokenServiceImpl(@Value("${jwt.secret}") final String secret) {
+    public JwtTokenComponent(@Value("${jwt.secret}") final String secret) {
         this.hmac512 = Algorithm.HMAC512(secret);
         this.verifier = JWT.require(this.hmac512).build();
     }
