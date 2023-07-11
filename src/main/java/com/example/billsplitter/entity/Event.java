@@ -33,10 +33,6 @@ public class Event {
 
     @CollectionTable(name = "event_member", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "username", length = 100)
-//    @AttributeOverrides({
-//            @AttributeOverride(name = "uuid", column = @Column(name = "uuid")),
-//            @AttributeOverride(name = "username", column = @Column(name = "username")),
-//    })
     @ElementCollection
     private List<Member> eventMembers = new ArrayList<>();
 

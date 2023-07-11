@@ -26,11 +26,9 @@ public class Cost {
     private String costDescription;
 
     @CollectionTable(name = "split_between_user", joinColumns = @JoinColumn(name = "cost_id"))
-//    @Column(name = "split_between", length = 100)
     @ElementCollection
     private List<Member> splitBetween;
 
-    //    @Column(name = "paid_by")//, length = 200, nullable = false)
     @Embedded
     @AttributeOverride(name = "uuid", column = @Column(name = "paid_by_uuid"))
     @AttributeOverride(name = "username", column = @Column(name = "paid_by_username"))

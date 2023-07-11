@@ -20,8 +20,6 @@ import java.util.UUID;
 public class Client {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_seq")
-//    @SequenceGenerator(name = "client_seq", sequenceName = "client_seq", allocationSize = 1)
     @Column(name = "client_id")
     private UUID id = UUID.randomUUID();
 
