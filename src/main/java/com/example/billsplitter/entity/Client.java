@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "client", indexes = @Index(columnList = "username"))
@@ -19,10 +20,10 @@ import java.util.List;
 public class Client {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_seq")
-    @SequenceGenerator(name = "client_seq", sequenceName = "client_seq", allocationSize = 1)
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_seq")
+//    @SequenceGenerator(name = "client_seq", sequenceName = "client_seq", allocationSize = 1)
     @Column(name = "client_id")
-    private Long id;
+    private UUID id = UUID.randomUUID();
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -45,7 +46,7 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Event> events = new ArrayList<>();
 
-    public Client(Long clientId) {
+    public Client(UUID clientId) {
         this.setId(clientId);
     }
 

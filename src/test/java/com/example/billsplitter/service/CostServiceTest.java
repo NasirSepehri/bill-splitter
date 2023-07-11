@@ -5,8 +5,10 @@ import com.example.billsplitter.dto.cost.PaymentsResponseDto;
 import com.example.billsplitter.entity.Client;
 import com.example.billsplitter.entity.Cost;
 import com.example.billsplitter.entity.Event;
+import com.example.billsplitter.entity.Member;
 import com.example.billsplitter.exception.AppException;
 import com.example.billsplitter.mapper.CostMapper;
+import com.example.billsplitter.mapper.MemberMapper;
 import com.example.billsplitter.repo.CostRepository;
 import com.example.billsplitter.repo.EventRepository;
 import com.example.billsplitter.service.impl.CostServiceImpl;
@@ -42,6 +44,9 @@ class CostServiceTest {
     CostMapper costMapper;
 
     @MockBean
+    MemberMapper memberMapper;
+
+    @MockBean
     MessageByLocaleComponent messageByLocaleComponent;
 
     @Autowired
@@ -54,10 +59,15 @@ class CostServiceTest {
         Event event = new Event();
         event.setId(1L);
         event.setName("event1");
-        event.setClient(new Client() {{
-            setUsername("Client1");
+
+        Member client1 = new Member("client1");
+        Member client2 = new Member("client2");
+        Member client3 = new Member("client3");
+        Member client4 = new Member("client3");//same name
+        event.setClient(new Client(client1.getUuid()) {{
+            setUsername(client1.getUsername());
         }});
-        event.setEventMembers(List.of("Client1", "Client2", "Client3", "Client4"));
+        event.setEventMembers(List.of(client1, client2, client3, client4));
 
         event.setCreatedDate(Instant.now());
 
@@ -65,27 +75,27 @@ class CostServiceTest {
         Cost cost1 = new Cost();
         cost1.setCostAmount(60.0F);
         cost1.setCostDescription("Cost1");
-        cost1.setSplitBetween(List.of("Client1", "Client2"));
-        cost1.setPaidBy("Client3");
+        cost1.setSplitBetween(List.of(client1, client2));
+        cost1.setPaidBy(client3);
         cost1.setEvent(event);
 
         Cost cost2 = new Cost();
         cost2.setCostAmount(70.0F);
         cost2.setCostDescription("Cost2");
-        cost2.setSplitBetween(List.of("Client1", "Client2", "Client3"));
-        cost2.setPaidBy("Client3");
+        cost2.setSplitBetween(List.of(client1, client2, client3));
+        cost2.setPaidBy(client3);
         cost2.setEvent(event);
 
         Cost cost3 = new Cost();
         cost3.setCostAmount(80.0F);
         cost3.setCostDescription("Cost3");
-        cost3.setSplitBetween(List.of("Client1", "Client2", "Client4"));
-        cost3.setPaidBy("Client3");
+        cost3.setSplitBetween(List.of(client1, client2, client4));
+        cost3.setPaidBy(client3);
         cost3.setEvent(event);
 
         event.setCosts(List.of(cost1, cost2, cost3));
 
-        event.setClient(new Client(1L));
+        event.setClient(new Client(client1.getUuid()));
 
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
@@ -99,13 +109,13 @@ class CostServiceTest {
 //    Column Sum	-80.00	    -80.00	    186.66666   -26.666666	 |   Row Sum=0
 
 
-        PaymentsResponseDto paymentsResponseDto = costServiceImpl.calculatePayments(1L, 1L);
-        Map<String, Float> paymentsMap = paymentsResponseDto.getPayments();
+        PaymentsResponseDto paymentsResponseDto = costServiceImpl.calculatePayments(1L, client1.getUuid());
+        Map<Member, Float> paymentsMap = paymentsResponseDto.getPayments();
 
-        assertEquals(-80.00F, paymentsMap.get("Client1"));
-        assertEquals(-80.00F, paymentsMap.get("Client2"));
-        assertEquals(186.66666F, paymentsMap.get("Client3"));
-        assertEquals(-26.666666F, paymentsMap.get("Client4"));
+        assertEquals(-80.00F, paymentsMap.get(client1));
+        assertEquals(-80.00F, paymentsMap.get(client2));
+        assertEquals(186.66666F, paymentsMap.get(client3));
+        assertEquals(-26.666666F, paymentsMap.get(client4));
 
     }
 
@@ -114,12 +124,16 @@ class CostServiceTest {
         Event event = new Event();
         event.setId(1L);
         event.setName("event1");
-        event.setClient(new Client(1L));
-        event.setEventMembers(List.of("Client1", "Client2", "Client3", "Client4"));
+        event.setClient(new Client());
+        Member client1 = new Member("client1");
+        Member client2 = new Member("client2");
+        Member client3 = new Member("client3");
+        Member client4 = new Member("client4");
+        event.setEventMembers(List.of(client1, client2, client3, client4));
 
         event.setCreatedDate(Instant.now());
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
-        assertThrows(AppException.Forbidden.class, () -> costServiceImpl.calculatePayments(1L, 2L));
+        assertThrows(AppException.Forbidden.class, () -> costServiceImpl.calculatePayments(1L, client2.getUuid()));
     }
 }

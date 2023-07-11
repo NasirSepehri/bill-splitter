@@ -7,12 +7,13 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class ClientDto {
 
 
-    private Long id;
+    private UUID id;
 
     @Size(min = 1, max = 255)
     private String username;

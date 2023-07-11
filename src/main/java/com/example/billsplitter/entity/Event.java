@@ -33,8 +33,12 @@ public class Event {
 
     @CollectionTable(name = "event_member", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "username", length = 100)
+//    @AttributeOverrides({
+//            @AttributeOverride(name = "uuid", column = @Column(name = "uuid")),
+//            @AttributeOverride(name = "username", column = @Column(name = "username")),
+//    })
     @ElementCollection
-    private List<String> eventMembers = new ArrayList<>();
+    private List<Member> eventMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Cost> costs = new ArrayList<>();

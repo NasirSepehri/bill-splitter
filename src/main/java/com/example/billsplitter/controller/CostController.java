@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "cost")
@@ -27,33 +28,33 @@ public class CostController {
 
     @GetMapping("/all")
     List<CostDto> getAllCostByEventId(@RequestParam("eventId") Long eventId, Authentication authentication) {
-        Long clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
+        UUID clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
         return costService.getAllCostByEventId(eventId, clientId);
     }
 
 
     @PostMapping
     CostDto add(@RequestBody @Valid AddCostDto addCostDto, Authentication authentication) {
-        Long clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
+        UUID clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
         return costService.add(addCostDto, clientId);
     }
 
     @PutMapping
     CostDto edit(@RequestBody @Valid EditCostDto editCostDto, Authentication authentication) {
-        Long clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
+        UUID clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
         return costService.edit(editCostDto, clientId);
     }
 
     @DeleteMapping
     String delete(@RequestParam("costId") Long costId, Authentication authentication) {
-        Long clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
+        UUID clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
         return costService.delete(costId, clientId);
     }
 
 
     @GetMapping("/payments")
     PaymentsResponseDto getPayments(@RequestParam("eventId") Long eventId, Authentication authentication) {
-        Long clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
+        UUID clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
         return costService.calculatePayments(eventId, clientId);
     }
 

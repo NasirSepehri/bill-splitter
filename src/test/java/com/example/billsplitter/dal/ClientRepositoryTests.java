@@ -3,6 +3,7 @@ package com.example.billsplitter.dal;
 import com.example.billsplitter.entity.Client;
 import com.example.billsplitter.entity.Cost;
 import com.example.billsplitter.entity.Event;
+import com.example.billsplitter.entity.Member;
 import com.example.billsplitter.enums.ClientRolesEnum;
 import com.example.billsplitter.repo.ClientRepository;
 import org.junit.jupiter.api.Test;
@@ -41,20 +42,25 @@ class ClientRepositoryTests {
         Event event1 = new Event();
         event1.setName("Event1");
         event1.setClient(new Client());
-        event1.setEventMembers(List.of("Client1", "Client2", "Client3"));
+
+        Member client1 = new Member("client1");
+        Member client2 = new Member("client2");
+        Member client3 = new Member("client3");
+
+        event1.setEventMembers(List.of(client1, client2, client3));
 
         Cost cost1 = new Cost();
         cost1.setCostAmount(60.0F);
         cost1.setCostDescription("Cost1");
-        cost1.setSplitBetween(List.of("Client1", "Client2"));
-        cost1.setPaidBy("Client3");
+        cost1.setSplitBetween(List.of(client1, client2));
+        cost1.setPaidBy(client3);
         cost1.setEvent(event1);
 
         Cost cost2 = new Cost();
         cost2.setCostAmount(70.0F);
         cost2.setCostDescription("Cost2");
-        cost2.setSplitBetween(List.of("Client1", "Client2", "Client3"));
-        cost2.setPaidBy("Client3");
+        cost2.setSplitBetween(List.of(client1, client2, client3));
+        cost2.setPaidBy(client3);
         cost2.setEvent(event1);
 
         event1.getCosts().addAll(List.of(cost1, cost2));
@@ -71,15 +77,15 @@ class ClientRepositoryTests {
         assertEquals("test@gmail.com", findClient.getEmail());
 
         assertEquals("Event1", findClient.getEvents().get(0).getName());
-        assertTrue(findClient.getEvents().get(0).getEventMembers().containsAll(List.of("Client1", "Client2", "Client3")));
+        assertTrue(findClient.getEvents().get(0).getEventMembers().containsAll(List.of(client1, client2, client3)));
 
 
         Event savedEvent = findClient.getEvents().get(0);
         assertEquals("Cost1", savedEvent.getCosts().get(0).getCostDescription());
         assertEquals("Cost2", savedEvent.getCosts().get(1).getCostDescription());
 
-        assertTrue(savedEvent.getCosts().get(0).getSplitBetween().containsAll(List.of("Client1", "Client2")));
-        assertTrue(savedEvent.getCosts().get(1).getSplitBetween().containsAll(List.of("Client1", "Client2", "Client3")));
+        assertTrue(savedEvent.getCosts().get(0).getSplitBetween().containsAll(List.of(client1, client2)));
+        assertTrue(savedEvent.getCosts().get(1).getSplitBetween().containsAll(List.of(client1, client2, client3)));
 
     }
 }

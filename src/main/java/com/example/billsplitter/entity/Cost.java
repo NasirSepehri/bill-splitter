@@ -25,13 +25,16 @@ public class Cost {
     @Column(name = "cost_description", length = 500, nullable = false)
     private String costDescription;
 
-    @CollectionTable(name = "split_between_user" , joinColumns = @JoinColumn(name = "cost_id"))
-    @Column(name = "split_between", length = 100)
+    @CollectionTable(name = "split_between_user", joinColumns = @JoinColumn(name = "cost_id"))
+//    @Column(name = "split_between", length = 100)
     @ElementCollection
-    private List<String> splitBetween;
+    private List<Member> splitBetween;
 
-    @Column(name = "paid_by", length = 200, nullable = false)
-    private String paidBy;
+    //    @Column(name = "paid_by")//, length = 200, nullable = false)
+    @Embedded
+    @AttributeOverride(name = "uuid", column = @Column(name = "paid_by_uuid"))
+    @AttributeOverride(name = "username", column = @Column(name = "paid_by_username"))
+    private Member paidBy;
 
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)

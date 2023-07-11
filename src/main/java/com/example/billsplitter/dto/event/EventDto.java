@@ -21,7 +21,7 @@ public class EventDto {
 
     private ClientDto client;
 
-    private List<String> eventMembers = new ArrayList<>();
+    private List<MemberDto> eventMembers = new ArrayList<>();
 
     private List<CostDto> costs = new ArrayList<>();
 
