@@ -1,7 +1,9 @@
 package com.example.billsplitter.controller;
 
 import com.example.billsplitter.dto.client.JwtUserDetails;
+import com.example.billsplitter.dto.cost.AddCostDto;
 import com.example.billsplitter.dto.cost.CostDto;
+import com.example.billsplitter.dto.cost.EditCostDto;
 import com.example.billsplitter.dto.cost.PaymentsResponseDto;
 import com.example.billsplitter.service.CostService;
 import jakarta.validation.Valid;
@@ -31,9 +33,15 @@ public class CostController {
 
 
     @PostMapping
-    CostDto add(@RequestBody @Valid CostDto costDto, Authentication authentication) {
+    CostDto add(@RequestBody @Valid AddCostDto addCostDto, Authentication authentication) {
         Long clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
-        return costService.add(costDto, clientId);
+        return costService.add(addCostDto, clientId);
+    }
+
+    @PutMapping
+    CostDto edit(@RequestBody @Valid EditCostDto editCostDto, Authentication authentication) {
+        Long clientId = ((JwtUserDetails) authentication.getPrincipal()).getId();
+        return costService.edit(editCostDto, clientId);
     }
 
     @DeleteMapping

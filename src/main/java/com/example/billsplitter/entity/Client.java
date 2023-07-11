@@ -42,8 +42,7 @@ public class Client {
     @Enumerated(EnumType.STRING)
     private ClientRolesEnum role;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Event> events = new ArrayList<>();
 
     public Client(Long clientId) {

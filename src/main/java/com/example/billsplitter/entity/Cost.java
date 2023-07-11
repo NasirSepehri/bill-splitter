@@ -1,17 +1,16 @@
 package com.example.billsplitter.entity;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cost")
 @Setter
 @Getter
-@EqualsAndHashCode
 public class Cost {
 
     @Id
@@ -37,4 +36,18 @@ public class Cost {
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cost cost = (Cost) o;
+        return Objects.equals(id, cost.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

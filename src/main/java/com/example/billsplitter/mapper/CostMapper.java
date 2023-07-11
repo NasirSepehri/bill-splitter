@@ -1,5 +1,6 @@
 package com.example.billsplitter.mapper;
 
+import com.example.billsplitter.dto.cost.AddCostDto;
 import com.example.billsplitter.dto.cost.CostDto;
 import com.example.billsplitter.dto.event.EventDto;
 import com.example.billsplitter.entity.Cost;
@@ -26,4 +27,7 @@ public interface CostMapper {
     CostDto toDto(Cost cost);
 
     Cost toEntity(CostDto costDto);
+
+    Cost toEntity(AddCostDto addCostDto);
+
 }
