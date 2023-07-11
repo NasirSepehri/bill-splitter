@@ -1,7 +1,9 @@
 package com.example.billsplitter.service.impl;
 
 import com.example.billsplitter.component.MessageByLocaleComponent;
+import com.example.billsplitter.dto.cost.AddCostDto;
 import com.example.billsplitter.dto.cost.CostDto;
+import com.example.billsplitter.dto.cost.EditCostDto;
 import com.example.billsplitter.dto.cost.PaymentsResponseDto;
 import com.example.billsplitter.entity.Cost;
 import com.example.billsplitter.entity.Event;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,18 +44,52 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public List<CostDto> getAllCostByEventId(Long eventId, Long clientId) {
-        getEvent(eventId, clientId);
-        return costRepository.findAllByEvent_IdOrderByIdAsc(eventId).stream()
+        Event event = getEvent(eventId, clientId);
+        return event.getCosts().stream()
                 .map(costMapper::toDto)
+                .sorted(Comparator.comparing(CostDto::getId))
                 .toList();
     }
 
     @Override
     @Transactional
-    public CostDto add(CostDto costDto, Long clientId) {
-        getEvent(costDto.getEvent().getId(), clientId);
-        Cost savedCost = costRepository.save(costMapper.toEntity(costDto));
-        return costMapper.toDto(savedCost);
+    public CostDto add(AddCostDto addCostDto, Long clientId) {
+        Event event = getEvent(addCostDto.getEventId(), clientId);
+        validateSplitMembers(event.getEventMembers(), addCostDto.getSplitBetween());
+        validatePayedBy(event.getEventMembers(), addCostDto.getPaidBy());
+        Cost cost = costMapper.toEntity(addCostDto);
+        cost.setEvent(event);
+        return costMapper.toDto(costRepository.save(cost));
+    }
+
+    private void validateSplitMembers(List<String> eventMembers, List<String> splitBetween) {
+        if (splitBetween.stream().anyMatch(s -> !eventMembers.contains(s))) {
+            throw new AppException.BadRequest(messageByLocaleComponent.getMessage("split.members.must.be.member.of.event.client",
+                    new Object[]{String.join(",", eventMembers)}));
+        }
+    }
+
+    private void validatePayedBy(List<String> eventMembers, String paidBy) {
+        if (!eventMembers.contains(paidBy)) {
+            throw new AppException.BadRequest(messageByLocaleComponent.getMessage("paid.by.client.must.be.member.of.event.client",
+                    new Object[]{String.join(",", eventMembers)}));
+        }
+    }
+
+
+    @Override
+    public CostDto edit(EditCostDto editCostDto, Long clientId) {
+        return costRepository.findById(editCostDto.getCostId()).map(cost -> {
+            Event event = getEvent(cost.getEvent().getId(), clientId);
+            validateSplitMembers(event.getEventMembers(), editCostDto.getSplitBetween());
+            validatePayedBy(event.getEventMembers(), editCostDto.getPaidBy());
+            cost.setCostDescription(editCostDto.getCostDescription());
+            cost.setCostAmount(editCostDto.getCostAmount());
+            cost.setPaidBy(editCostDto.getPaidBy());
+            cost.setSplitBetween(editCostDto.getSplitBetween());
+            return costMapper.toDto(costRepository.save(cost));
+        }).orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent.getMessage("cost.not.found")));
+
     }
 
     @Override
@@ -60,7 +97,7 @@ public class CostServiceImpl implements CostService {
     public String delete(Long costId, Long clientId) {
         return costRepository.findById(costId).map(cost -> {
             getEvent(cost.getEvent().getId(), clientId);
-            costRepository.deleteById(costId);
+            costRepository.delete(cost);
             return "Done";
         }).orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent.getMessage("cost.not.found",
                 new Object[]{String.valueOf(costId)})));
