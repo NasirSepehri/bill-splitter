@@ -53,12 +53,12 @@ public class GlobalExceptionHandler {
 
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
     public ResponseEntity<ProblemDetail> methodArgumentNotValidException(Exception exception, WebRequest request) {
         log.info(exception.getMessage(), exception);
         String message = "";
         message = ((MethodArgumentNotValidException) exception).getBindingResult().getFieldErrors().stream().map(fieldError ->
-                fieldError.getField() + " in " + fieldError.getObjectName() + " " + fieldError.getDefaultMessage()
+                fieldError.getField() + " " + fieldError.getDefaultMessage()
 
         ).collect(Collectors.joining(" \n "));
         return new ResponseEntity<>(createResponse(HttpStatus.BAD_REQUEST, message, request), HttpStatus.BAD_REQUEST);

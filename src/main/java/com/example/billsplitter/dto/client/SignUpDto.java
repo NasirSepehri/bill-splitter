@@ -2,7 +2,7 @@ package com.example.billsplitter.dto.client;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -20,12 +20,13 @@ public class SignUpDto {
     private String username;
 
     @Email
-    @NotNull
+    @NotBlank
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$",
-            message = "Password must contain letter and number and @$!%*#?& characters")
+            message = "Password must be at least 8 characters and at least contain one letter and one number and one @$!%*#?& characters.")
+    @NotBlank
     private String password;
 
 }
