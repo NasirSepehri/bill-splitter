@@ -2,11 +2,12 @@ package com.example.billsplitter.service.impl;
 
 import com.example.billsplitter.component.MessageByLocaleComponent;
 import com.example.billsplitter.dto.event.AddEventDto;
+import com.example.billsplitter.dto.event.AddMemberDto;
 import com.example.billsplitter.dto.event.EditEventDto;
 import com.example.billsplitter.dto.event.EventDto;
-import com.example.billsplitter.dto.event.MemberDto;
 import com.example.billsplitter.entity.Client;
 import com.example.billsplitter.entity.Event;
+import com.example.billsplitter.entity.Member;
 import com.example.billsplitter.exception.AppException;
 import com.example.billsplitter.mapper.EventMapper;
 import com.example.billsplitter.repo.EventRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -47,7 +49,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventDto addEvent(AddEventDto addEventDto, @NotNull Long clientId) {
+    public EventDto addEvent(AddEventDto addEventDto, @NotNull UUID clientId) {
 
         Event event = new Event();
         event.setName(addEventDto.getName());
@@ -61,7 +63,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventDto editEvent(EditEventDto editEventDto, Long clientId) {
+    public EventDto editEvent(EditEventDto editEventDto, UUID clientId) {
         Event event = getEvent(editEventDto.getEventId(), clientId);
         event.setName(editEventDto.getName());
         event.setDescription(editEventDto.getDescription());
@@ -71,7 +73,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public void delete(Long eventId, Long clientId) {
+    public void delete(Long eventId, UUID clientId) {
         Event event = getEvent(eventId, clientId);
         eventRepository.delete(event);
     }
@@ -79,21 +81,21 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     //// TODO: 7/11/23 change event table structure
-    public MemberDto addMember(MemberDto memberDto, Long clientId) {
-        Event event = getEvent(memberDto.getEventId(), clientId);
-        event.getEventMembers().add(memberDto.getMemberUsername());
-        return memberDto;
+    public AddMemberDto addMember(AddMemberDto addMemberDto, UUID clientId) {
+        Event event = getEvent(addMemberDto.getEventId(), clientId);
+        event.getEventMembers().add(new Member(addMemberDto.getMemberUsername()));
+        return addMemberDto;
     }
 
 
     @Override
-    public void deleteMember(Long eventId, String memberUsername, Long clientId) {
+    public void deleteMember(Long eventId, String memberUsername, UUID clientId) {
         Event event = getEvent(eventId, clientId);
         eventRepository.deleteMemberByEventIdAndMemberUsername(event.getId(), memberUsername);
     }
 
 
-    private Event getEvent(Long eventId, Long clientId) {
+    private Event getEvent(Long eventId, UUID clientId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent
                         .getMessage("event.not.found", new Object[]{String.valueOf(eventId)})));

@@ -1,15 +1,11 @@
 package com.example.billsplitter.dto.event;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.util.UUID;
 
 @Data
 public class MemberDto {
-
-    @NotNull
-    private Long eventId;
-
-    @NotBlank
-    private String memberUsername;
+    private UUID uuid;
+    private String username;
 }

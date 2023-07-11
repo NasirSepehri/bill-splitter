@@ -7,7 +7,7 @@ import com.example.billsplitter.entity.Cost;
 import com.example.billsplitter.entity.Event;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MemberMapper.class})
 public interface CostMapper {
 
     default EventDto toEventDto(Event event) {

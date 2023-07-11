@@ -5,10 +5,13 @@ import com.example.billsplitter.dto.cost.AddCostDto;
 import com.example.billsplitter.dto.cost.CostDto;
 import com.example.billsplitter.dto.cost.EditCostDto;
 import com.example.billsplitter.dto.cost.PaymentsResponseDto;
+import com.example.billsplitter.dto.event.MemberDto;
 import com.example.billsplitter.entity.Cost;
 import com.example.billsplitter.entity.Event;
+import com.example.billsplitter.entity.Member;
 import com.example.billsplitter.exception.AppException;
 import com.example.billsplitter.mapper.CostMapper;
+import com.example.billsplitter.mapper.MemberMapper;
 import com.example.billsplitter.repo.CostRepository;
 import com.example.billsplitter.repo.EventRepository;
 import com.example.billsplitter.service.CostService;
@@ -16,10 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toCollection;
 
 @Service
 public class CostServiceImpl implements CostService {
@@ -29,21 +32,24 @@ public class CostServiceImpl implements CostService {
     private final EventRepository eventRepository;
     private final CostMapper costMapper;
     private final MessageByLocaleComponent messageByLocaleComponent;
+    private final MemberMapper memberMapper;
 
     @Autowired
     public CostServiceImpl(CostRepository costRepository,
                            EventRepository eventRepository,
                            CostMapper costMapper,
-                           MessageByLocaleComponent messageByLocaleComponent) {
+                           MessageByLocaleComponent messageByLocaleComponent,
+                           MemberMapper memberMapper) {
         this.costRepository = costRepository;
         this.eventRepository = eventRepository;
         this.costMapper = costMapper;
         this.messageByLocaleComponent = messageByLocaleComponent;
+        this.memberMapper = memberMapper;
     }
 
 
     @Override
-    public List<CostDto> getAllCostByEventId(Long eventId, Long clientId) {
+    public List<CostDto> getAllCostByEventId(Long eventId, UUID clientId) {
         Event event = getEvent(eventId, clientId);
         return event.getCosts().stream()
                 .map(costMapper::toDto)
@@ -53,7 +59,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     @Transactional
-    public CostDto add(AddCostDto addCostDto, Long clientId) {
+    public CostDto add(AddCostDto addCostDto, UUID clientId) {
         Event event = getEvent(addCostDto.getEventId(), clientId);
         validateSplitMembers(event.getEventMembers(), addCostDto.getSplitBetween());
         validatePayedBy(event.getEventMembers(), addCostDto.getPaidBy());
@@ -62,31 +68,35 @@ public class CostServiceImpl implements CostService {
         return costMapper.toDto(costRepository.save(cost));
     }
 
-    private void validateSplitMembers(List<String> eventMembers, List<String> splitBetween) {
-        if (splitBetween.stream().anyMatch(s -> !eventMembers.contains(s))) {
+    private void validateSplitMembers(List<Member> eventMembers, List<MemberDto> splitBetween) {
+        if (splitBetween.stream().anyMatch(sbm -> eventMembers.stream().noneMatch(member -> member.getUuid().equals(sbm.getUuid())))) {
             throw new AppException.BadRequest(messageByLocaleComponent.getMessage("split.members.must.be.member.of.event.client",
-                    new Object[]{String.join(",", eventMembers)}));
+                    new Object[]{eventMembers.stream().map(member -> member.getUuid().toString())
+                            .collect(Collectors.joining(","))}));
         }
     }
 
-    private void validatePayedBy(List<String> eventMembers, String paidBy) {
-        if (!eventMembers.contains(paidBy)) {
+    private void validatePayedBy(List<Member> eventMembers, MemberDto paidBy) {
+        if (eventMembers.stream().noneMatch(member -> member.getUuid().equals(paidBy.getUuid()))) {
             throw new AppException.BadRequest(messageByLocaleComponent.getMessage("paid.by.client.must.be.member.of.event.client",
-                    new Object[]{String.join(",", eventMembers)}));
+                    new Object[]{eventMembers.stream().map(member -> member.getUuid().toString())
+                            .collect(Collectors.joining(","))}));
         }
     }
 
 
     @Override
-    public CostDto edit(EditCostDto editCostDto, Long clientId) {
+    @Transactional
+    public CostDto edit(EditCostDto editCostDto, UUID clientId) {
         return costRepository.findById(editCostDto.getCostId()).map(cost -> {
             Event event = getEvent(cost.getEvent().getId(), clientId);
             validateSplitMembers(event.getEventMembers(), editCostDto.getSplitBetween());
             validatePayedBy(event.getEventMembers(), editCostDto.getPaidBy());
             cost.setCostDescription(editCostDto.getCostDescription());
             cost.setCostAmount(editCostDto.getCostAmount());
-            cost.setPaidBy(editCostDto.getPaidBy());
-            cost.setSplitBetween(editCostDto.getSplitBetween());
+            cost.setPaidBy(memberMapper.toEntity(editCostDto.getPaidBy()));
+            cost.setSplitBetween(editCostDto.getSplitBetween().stream()
+                    .map(memberMapper::toEntity).collect(toCollection(ArrayList::new)));
             return costMapper.toDto(costRepository.save(cost));
         }).orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent.getMessage("cost.not.found")));
 
@@ -94,7 +104,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     @Transactional
-    public String delete(Long costId, Long clientId) {
+    public String delete(Long costId, UUID clientId) {
         return costRepository.findById(costId).map(cost -> {
             getEvent(cost.getEvent().getId(), clientId);
             costRepository.delete(cost);
@@ -104,11 +114,11 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public PaymentsResponseDto calculatePayments(final Long eventId, final Long clientId) {
+    public PaymentsResponseDto calculatePayments(final Long eventId, final UUID clientId) {
         Event event = getEvent(eventId, clientId);
-        Map<String, Float> eventMembersMap = event.getEventMembers().stream().collect(Collectors.toConcurrentMap(s -> s, s -> 0.0F));
+        Map<Member, Float> eventMembersMap = event.getEventMembers().stream().collect(Collectors.toConcurrentMap(s -> s, s -> 0.0F));
         event.getCosts().forEach(cost -> {
-            List<String> splitBetween = cost.getSplitBetween();
+            List<Member> splitBetween = cost.getSplitBetween();
             float payedEachOne = cost.getCostAmount() / splitBetween.size();
             eventMembersMap.put(cost.getPaidBy(), eventMembersMap.get(cost.getPaidBy()) + cost.getCostAmount());
             splitBetween.forEach(client ->
@@ -120,7 +130,7 @@ public class CostServiceImpl implements CostService {
         return paymentsResponseDto;
     }
 
-    private Event getEvent(Long eventId, Long clientId) {
+    private Event getEvent(Long eventId, UUID clientId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException.NotFound(messageByLocaleComponent
                         .getMessage("event.not.found", new Object[]{String.valueOf(eventId)})));
