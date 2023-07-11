@@ -20,5 +20,5 @@ public interface EventService {
 
     AddMemberDto addMember(AddMemberDto addMemberDto, UUID clientId);
 
-    void deleteMember(Long eventId, String memberUsername, UUID clientId);
+    void deleteMember(Long eventId, UUID memberUuid, UUID clientId);
 }
