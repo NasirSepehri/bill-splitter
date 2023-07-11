@@ -1,8 +1,6 @@
 package com.example.billsplitter.component;
 
 import com.example.billsplitter.dto.client.JwtUserDetails;
-import com.example.billsplitter.service.impl.JwtTokenServiceImpl;
-import com.example.billsplitter.service.impl.JwtUserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,13 +19,13 @@ import java.io.IOException;
 public class JwtRequestFilterComponent extends OncePerRequestFilter {
 
 
-    private final JwtTokenServiceImpl jwtTokenServiceImpl;
-    private final JwtUserDetailsServiceImpl jwtUserDetailsServiceImpl;
+    private final JwtTokenComponent jwtTokenComponent;
+    private final JwtUserDetailsComponent jwtUserDetailsComponent;
 
 
-    public JwtRequestFilterComponent(JwtTokenServiceImpl jwtTokenServiceImpl, JwtUserDetailsServiceImpl jwtUserDetailsServiceImpl) {
-        this.jwtTokenServiceImpl = jwtTokenServiceImpl;
-        this.jwtUserDetailsServiceImpl = jwtUserDetailsServiceImpl;
+    public JwtRequestFilterComponent(JwtTokenComponent jwtTokenComponent, JwtUserDetailsComponent jwtUserDetailsComponent) {
+        this.jwtTokenComponent = jwtTokenComponent;
+        this.jwtUserDetailsComponent = jwtUserDetailsComponent;
     }
 
     @Override
@@ -41,7 +39,7 @@ public class JwtRequestFilterComponent extends OncePerRequestFilter {
         }
 
         final String token = header.substring(7);
-        final String username = jwtTokenServiceImpl.validateTokenAndGetUsername(token);
+        final String username = jwtTokenComponent.validateTokenAndGetUsername(token);
         if (username == null) {
             // validation failed or token expired
             chain.doFilter(request, response);
@@ -49,7 +47,7 @@ public class JwtRequestFilterComponent extends OncePerRequestFilter {
         }
 
         // set user details on spring security context
-        final JwtUserDetails userDetails = jwtUserDetailsServiceImpl.loadUserByUsername(username);
+        final JwtUserDetails userDetails = jwtUserDetailsComponent.loadUserByUsername(username);
         final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

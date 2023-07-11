@@ -34,7 +34,7 @@ public class Event {
     @ElementCollection
     private List<String> eventMembers = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private List<Cost> costs = new ArrayList<>();
 
